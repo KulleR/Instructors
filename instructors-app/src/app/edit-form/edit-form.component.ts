@@ -10,7 +10,7 @@ import { Instructor } from '../models/Instructor';
   styleUrls: ['./edit-form.component.css']
 })
 export class EditFormComponent {
-
+  isLoading: boolean;
   editInstructorForm = this.fb.group({
     id: [],
     firstName: [null, Validators.required],
@@ -28,8 +28,14 @@ export class EditFormComponent {
       return;
     }
     let instructor = Object.assign({}, this.editInstructorForm.value);
-    this.instructorsService.edit(instructor).subscribe();
-    this.onClose();
+    this.isLoading = true;
+    this.instructorsService.update(instructor,
+      (result) => { },
+      (result) => { },
+      () => {
+        this.onClose();
+        this.isLoading = false
+      });
   }
 
   onClose() {

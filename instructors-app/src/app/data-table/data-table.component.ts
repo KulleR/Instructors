@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, MatSort, MatTable, MatDialog, MatDialogConfig, MatDialogRef } from '@angular/material';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { DataTableDataSource } from './data-table-datasource';
 import { InstructorsService } from '../services/instructors.service';
 import { Instructor } from '../models/Instructor';
@@ -21,37 +22,47 @@ export class DataTableComponent implements OnInit {
   /** Columns displayed in the table. Columns IDs can be added, removed, or reordered. */
   displayedColumns = ['firstName', 'lastName', 'delete'];
 
-  constructor(private instructorsService: InstructorsService, private dialog: MatDialog) { }
+  constructor(private instructorsService: InstructorsService, private dialog: MatDialog, private _snackBar: MatSnackBar) { }
 
   ngOnInit() {
     this.reloadData();
   }
 
   private onDelete(instructor: Instructor) {
-    this.instructorsService.delete(instructor);
-    this.refreshTable();
+    this.instructorsService.delete(instructor, () => {
+      this._snackBar.open('Instructor deleted successfuly.');
+      this.refreshTable();
+    });
   }
 
   private onCreate() {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
-    this.dialog.open(AddFormComponent, dialogConfig);
+    const dialogRef = this.dialog.open(AddFormComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe((result) => {
+      this._snackBar.open('Instructor created successfuly.');
+      this.refreshTable();
+    })
   }
 
   private onEdit(instructor: Instructor) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
     dialogConfig.data = instructor;
-    this.dialog.open(EditFormComponent, dialogConfig);
+    const dialogRef = this.dialog.open(EditFormComponent, dialogConfig);
+    dialogRef.afterClosed().subscribe((result) => {
+      this._snackBar.open('Instructor updated successfuly.');
+      this.refreshTable();
+    })
   }
 
   private refreshTable() {
     this.paginator._changePageSize(this.paginator.pageSize);
   }
 
-  private reloadData(){
-    this.instructorsService.getAll().subscribe((result: Instructor[]) => {
-      this.dataSource = new DataTableDataSource(result);
+  private reloadData() {
+    this.instructorsService.getAll((result: Instructor[]) => {
+      this.dataSource = new DataTableDataSource(this.instructorsService.instructors);
       this.dataSource.sort = this.sort;
       this.dataSource.paginator = this.paginator;
       this.table.dataSource = this.dataSource;

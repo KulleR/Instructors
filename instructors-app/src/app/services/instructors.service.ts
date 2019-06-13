@@ -6,37 +6,42 @@ import { Injectable } from '@angular/core';
 export class InstructorsService {
     instructors: Instructor[];
 
-    readonly apiUrl = "http://localhost:4050/api/instructors";
+    readonly apiUrl = "http://localhost:52509/api/instructors";
 
     constructor(private http: HttpClient) { }
 
-    getAll(success: Function) {
-        return this.http.get(this.apiUrl).subscribe((result: Instructor[]) => {
-            this.instructors = result;
-            success(result);
-        });
-    }
-
-    create(instructor: Instructor, success: Function) {
+    create(instructor: Instructor, success: Function = () => { }, error: Function = () => { }, complete: Function = () => { }) {
         return this.http.post(this.apiUrl, instructor).subscribe((result: Instructor) => {
             this.instructors.push(result);
             success(result);
-        });
+        }, (result) => { error(result) }, () => { complete() });
     }
 
-    delete(instructor: Instructor, success: Function) {
+    getAll(success: Function = () => { }, error: Function = () => { }, complete: Function = () => { }) {
+        return this.http.get(this.apiUrl).subscribe((result: Instructor[]) => {
+            this.instructors = result;
+            success(result);
+        }, (result) => { error(result) }, () => { complete() });
+    }
+
+    delete(instructor: Instructor, success: Function = () => { }, error: Function = () => { }, complete: Function = () => { }) {
         return this.http.delete(`${this.apiUrl}/${instructor.id}`).subscribe((result: Instructor) => {
-            this.instructors.slice();
+            const index = this.instructors.indexOf(instructor);
+            if (index > -1) {
+                this.instructors.splice(index, 1);
+            }
             success(result);
-        });
+        }, (result) => { error(result) }, () => { complete() });
     }
 
-    edit(instructor: Instructor, success: Function) {
+    update(instructor: Instructor, success: Function = () => { }, error: Function = () => { }, complete: Function = () => { }) {
         return this.http.put(`${this.apiUrl}/${instructor.id}`, instructor).subscribe((result: Instructor) => {
-            const index = this.instructors.indexOf(instructor);
-
-            this.instructors;
+            let oldInstructor = this.instructors.find(i => i.id == instructor.id);
+            const index = this.instructors.indexOf(oldInstructor);
+            if (index > -1) {
+                this.instructors[index] = instructor;
+            }
             success(result);
-        });
+        }, (result) => { error(result) }, () => { complete() });
     }
 }

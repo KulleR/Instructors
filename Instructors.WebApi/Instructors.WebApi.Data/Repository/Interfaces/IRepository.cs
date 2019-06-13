@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Instructors.WebApi.Data.Models.Entity;
 
 namespace Instructors.WebApi.Data.Repository.Interfaces
@@ -13,7 +14,7 @@ namespace Instructors.WebApi.Data.Repository.Interfaces
         /// </summary>
         /// <param name="id">Идентификатор сущности</param>
         /// <returns>Сущность с указанным Id, если существует. Иначе - null.</returns>
-        TEntity Get(int id);
+        Task<TEntity> GetAsync(int id);
 
         /// <summary>
         /// Загрузка всех объектов данной сущности
@@ -25,18 +26,18 @@ namespace Instructors.WebApi.Data.Repository.Interfaces
         /// Сохранить объект сущность
         /// </summary>
         /// <param name="entity">Сохраняемый объект</param>
-        int Save(TEntity entity);
+        Task<bool> SaveAsync(TEntity entity);
 
         /// <summary>
         /// Обновить объект сущность
         /// </summary>
         /// <param name="entity">Обновляемый объект</param>
-        void Update(TEntity entity);
+        bool Update(TEntity entity);
 
         /// <summary>
         /// Удалить объект сущности
         /// </summary>
         /// <param name="entity">Удаляемая сущность</param>
-        void Delete(TEntity entity);
+        bool Delete(TEntity entity);
     }
 }

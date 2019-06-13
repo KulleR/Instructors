@@ -24,58 +24,78 @@ namespace Instructors.WebApi.Controllers
             InstructorRepository = instructorRepository;
             Mapper = mapper;
         }
-
-        // GET api/values
+        
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public IActionResult Get()
         {
             return Ok(InstructorRepository.GetAll());
         }
-
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        
+        [HttpGet("{id}", Name = "GetInstructor")]
+        public async Task<IActionResult> Get(int id)
         {
-            return Ok(InstructorRepository.Get(id));
-        }
+            Instructor dbInstructor = await InstructorRepository.GetAsync(id);
 
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody]InstructorDto instructor)
-        {
-            InstructorRepository.Save(Mapper.Map<Instructor>(instructor));
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody]InstructorDto instructor)
-        {
-            Instructor dbInstructor = InstructorRepository.Get(id);
-
-            if (instructor == null)
+            if (dbInstructor == null)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            dbInstructor.FirstName = instructor.FirstName;
-            dbInstructor.MiddleName = instructor.MiddleName;
-            dbInstructor.LastName = instructor.LastName;
-
-            InstructorRepository.Update(dbInstructor);
             return Ok(dbInstructor);
         }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody]InstructorDto instructor)
         {
-            Instructor instructor = InstructorRepository.Get(id);
+            if (instructor == null)
+            {
+                return BadRequest();
+            }
+
+            Instructor instructorToSave = Mapper.Map<Instructor>(instructor);
+            if (!await InstructorRepository.SaveAsync(instructorToSave))
+            {
+                throw new Exception("Creating a instructor failed on save.");
+            }
+
+            InstructorDto instructorToReturn = Mapper.Map<InstructorDto>(instructorToSave);
+            return CreatedAtRoute("GetInstructor", new { id = instructorToReturn.Id }, instructorToReturn);
+        }
+        
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Put(int id, [FromBody]InstructorDto instructor)
+        {
+            Instructor dbInstructor = await InstructorRepository.GetAsync(id);
+
+            if (instructor == null)
+            {
+                return BadRequest();
+            }
+
+            Mapper.Map(instructor, dbInstructor);
+
+            if (!InstructorRepository.Update(dbInstructor))
+            {
+                throw new Exception($"Updating a instructor {id} failed on save.");
+            }
+
+            return NoContent();
+        }
+        
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            Instructor instructor = await InstructorRepository.GetAsync(id);
             if (instructor == null)
             {
                 return NotFound();
             }
-            InstructorRepository.Delete(instructor);
-            return Ok(instructor);
+            
+            if (!InstructorRepository.Delete(instructor))
+            {
+                throw new Exception($"Deleting a instructor {id} failed on save.");
+            }
+            return NoContent();
         }
     }
 }

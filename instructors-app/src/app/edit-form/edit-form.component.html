@@ -34,7 +34,10 @@
         </div>
       </mat-card-content>
       <mat-card-actions>
-        <button mat-raised-button color="primary" type="submit">Submit</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="isLoading">
+          <span *ngIf="this.isLoading; else primaryBlock">Submitting . . .</span> 
+          <ng-template #primaryBlock>Submit</ng-template>
+        </button>
       </mat-card-actions>
     </mat-card>
   </form>

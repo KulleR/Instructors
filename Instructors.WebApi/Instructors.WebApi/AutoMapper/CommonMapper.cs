@@ -21,6 +21,11 @@ namespace Instructors.WebApi.AutoMapper
             return Mapper.Map(source, sourceType, destinationType);
         }
 
+        public object Map(object source, object destination)
+        {
+            return Mapper.Map(source, destination);
+        }
+
         public T Map<T>(object source) where T : class
         {
             return (T)Mapper.Map(source, source.GetType(), typeof(T));

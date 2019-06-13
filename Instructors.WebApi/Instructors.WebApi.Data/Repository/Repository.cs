@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Instructors.WebApi.Data.Models.Entity;
 using Instructors.WebApi.Data.Repository.Interfaces;
 
@@ -18,15 +19,15 @@ namespace Instructors.WebApi.Data.Repository
             DbContext = context;
         }
 
-        public void Delete(TEntity entity)
+        public bool Delete(TEntity entity)
         {
             DbContext.Remove(entity);
-            DbContext.SaveChanges();
+            return DbContext.SaveChanges() > 0;
         }
 
-        public TEntity Get(int id)
+        public async Task<TEntity> GetAsync(int id)
         {
-            return DbContext.Find<TEntity>(id);
+            return await DbContext.FindAsync<TEntity>(id);
         }
 
         public IQueryable<TEntity> GetAll()
@@ -34,17 +35,16 @@ namespace Instructors.WebApi.Data.Repository
             return DbContext.Set<TEntity>();
         }
 
-        public int Save(TEntity entity)
+        public async Task<bool> SaveAsync(TEntity entity)
         {
-            DbContext.Add(entity);
-            DbContext.SaveChanges();
-            return entity.Id;
+            await DbContext.AddAsync(entity);
+            return DbContext.SaveChanges() > 0;
         }
 
-        public void Update(TEntity entity)
+        public bool Update(TEntity entity)
         {
             DbContext.Update(entity);
-            DbContext.SaveChanges();
+            return DbContext.SaveChanges() > 0;
         }
     }
 }
