@@ -13,7 +13,7 @@ export class AddFormComponent {
   addInstructorForm = this.fb.group({
     firstName: [null, Validators.required],
     lastName: [null, Validators.required],
-    middleName: [null, Validators.required],
+    middleName: [null],
   });
 
   constructor(private fb: FormBuilder, private instructorsService: InstructorsService,

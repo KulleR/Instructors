@@ -15,7 +15,7 @@ export class EditFormComponent {
     id: [],
     firstName: [null, Validators.required],
     lastName: [null, Validators.required],
-    middleName: [null, Validators.required],
+    middleName: [null],
   });
 
   constructor(private fb: FormBuilder, private instructorsService: InstructorsService,
