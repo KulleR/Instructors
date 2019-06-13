@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { InstructorsService } from '../services/instructors.service';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import { MatDialogRef, MAT_DIALOG_DATA, MatSnackBar } from '@angular/material';
 import { Instructor } from '../models/Instructor';
 
 @Component({
@@ -19,7 +19,8 @@ export class EditFormComponent {
   });
 
   constructor(private fb: FormBuilder, private instructorsService: InstructorsService,
-    private dialogRef: MatDialogRef<EditFormComponent>, @Inject(MAT_DIALOG_DATA) public instructor: Instructor) {
+    private dialogRef: MatDialogRef<EditFormComponent>, @Inject(MAT_DIALOG_DATA) public instructor: Instructor,
+    private _snackBar: MatSnackBar) {
     this.editInstructorForm.setValue(instructor);
   }
 
@@ -30,16 +31,15 @@ export class EditFormComponent {
     let instructor = Object.assign({}, this.editInstructorForm.value);
     this.isLoading = true;
     this.instructorsService.update(instructor,
-      (result) => { },
-      (result) => { },
-      () => {
-        this.onClose();
+      (result) => {
+        this._snackBar.open('Instructor updated successfully.', '', { duration: 3000 });
+        this.dialogRef.close();
+        this.isLoading = false
+      },
+      (result) => {
+        this._snackBar.open(`Updating a instructor failed. ${result.message}`, '', { duration: 3000 });
+        this.dialogRef.close();
         this.isLoading = false
       });
-  }
-
-  onClose() {
-    this.editInstructorForm.reset();
-    this.dialogRef.close();
   }
 }

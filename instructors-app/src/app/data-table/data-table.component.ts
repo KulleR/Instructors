@@ -30,30 +30,31 @@ export class DataTableComponent implements OnInit {
 
   private onDelete(instructor: Instructor) {
     this.instructorsService.delete(instructor, () => {
-      this._snackBar.open('Instructor deleted successfuly.');
+      this._snackBar.open('Instructor deleted successfully.', '', { duration: 3000 });
       this.refreshTable();
-    });
+    },
+      (result) => {
+        this._snackBar.open('Deleting a instructor failed.', '', { duration: 3000 });
+      });
   }
 
   private onCreate() {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
-    const dialogRef = this.dialog.open(AddFormComponent, dialogConfig);
-    dialogRef.afterClosed().subscribe((result) => {
-      this._snackBar.open('Instructor created successfuly.');
-      this.refreshTable();
-    })
+    this.dialog.open(AddFormComponent, dialogConfig).
+      afterClosed().subscribe((result) => {
+        this.refreshTable();
+      });
   }
 
   private onEdit(instructor: Instructor) {
     const dialogConfig = new MatDialogConfig();
     dialogConfig.autoFocus = true;
     dialogConfig.data = instructor;
-    const dialogRef = this.dialog.open(EditFormComponent, dialogConfig);
-    dialogRef.afterClosed().subscribe((result) => {
-      this._snackBar.open('Instructor updated successfuly.');
-      this.refreshTable();
-    })
+    this.dialog.open(EditFormComponent, dialogConfig).
+      afterClosed().subscribe((result) => {
+        this.refreshTable();
+      });
   }
 
   private refreshTable() {
@@ -66,6 +67,8 @@ export class DataTableComponent implements OnInit {
       this.dataSource.sort = this.sort;
       this.dataSource.paginator = this.paginator;
       this.table.dataSource = this.dataSource;
+    }, (result) => {
+      this._snackBar.open(`Loading instructors failed. ${result.message}`);
     });
   }
 }

@@ -32,17 +32,14 @@ namespace Instructors.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // получаем строку подключения из файла конфигурации
-            string connection = Configuration.GetConnectionString("DefaultConnection");
-            // добавляем контекст DatabaseContext в качестве сервиса в приложение
-            services.AddDbContext<DatabaseContext>(options => options.UseSqlite(connection));
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            string connection = Configuration.GetConnectionString("DefaultConnection");
+            // Add a DatabaseContext context as a service to the application.
+            services.AddDbContext<DatabaseContext>(options => options.UseSqlite(connection));
             services.AddTransient<IRepository<IEntity>, Repository<IEntity>>();
             services.AddTransient<IInstructorRepository, InstructorRepository>();
             services.AddTransient<ICommonMapper, CommonMapper>();
-
             services.AddCors(options =>
             {
                 options.AddPolicy(_myAllowSpecificOrigins,
@@ -59,6 +56,7 @@ namespace Instructors.WebApi
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
             {
                 var context = serviceScope.ServiceProvider.GetRequiredService<DatabaseContext>();
+                // Aply migrations. Create database if not exist.
                 context.Database.Migrate();
             }
 
@@ -68,6 +66,7 @@ namespace Instructors.WebApi
             }
             else
             {
+                // Global error handler
                 app.UseExceptionHandler(appBuilder =>
                 {
                     appBuilder.Run(async context =>
@@ -77,9 +76,7 @@ namespace Instructors.WebApi
                     });
                 });
             }
-
-
-
+            
             app.UseCors(_myAllowSpecificOrigins);
             app.UseMvc();
         }

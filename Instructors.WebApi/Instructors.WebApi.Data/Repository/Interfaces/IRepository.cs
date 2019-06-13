@@ -10,34 +10,34 @@ namespace Instructors.WebApi.Data.Repository.Interfaces
     public interface IRepository<TEntity> where TEntity : IEntity
     {
         /// <summary>
-        /// Получить сущность по идентификатору. В ряде случаев использование GetOrThrow более предпочтительно.
+        /// Get entity by ID
         /// </summary>
-        /// <param name="id">Идентификатор сущности</param>
-        /// <returns>Сущность с указанным Id, если существует. Иначе - null.</returns>
+        /// <param name="id">Entity ID</param>
+        /// <returns>Entity with the specified Id, if exists. Else, null.</returns>
         Task<TEntity> GetAsync(int id);
 
         /// <summary>
-        /// Загрузка всех объектов данной сущности
+        /// Loading all objects of this entity
         /// </summary>
-        /// <returns>Неупорядоченный список всех объектов</returns>
+        /// <returns>Unordered list of all objects</returns>
         IQueryable<TEntity> GetAll();
 
         /// <summary>
-        /// Сохранить объект сущность
+        /// Save entity object
         /// </summary>
-        /// <param name="entity">Сохраняемый объект</param>
+        /// <param name="entity">Saved object</param>
         Task<bool> SaveAsync(TEntity entity);
 
         /// <summary>
-        /// Обновить объект сущность
+        /// Update entity object
         /// </summary>
-        /// <param name="entity">Обновляемый объект</param>
+        /// <param name="entity">Updated object</param>
         bool Update(TEntity entity);
 
         /// <summary>
-        /// Удалить объект сущности
+        /// Delete entity object
         /// </summary>
-        /// <param name="entity">Удаляемая сущность</param>
+        /// <param name="entity">Deleted object</param>
         bool Delete(TEntity entity);
     }
 }
